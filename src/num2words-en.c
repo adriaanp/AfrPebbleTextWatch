@@ -2,42 +2,42 @@
 #include "string.h"
 
 static const char* const ONES[] = {
-  "o'clock",
-  "one",
-  "two",
-  "three",
-  "four",
-  "five",
-  "six",
-  "seven",
-  "eight",
-  "nine"
+  "uur",
+  "een",
+  "twee",
+  "drie",
+  "vier",
+  "vyf",
+  "ses",
+  "sewe",
+  "agt",
+  "nege"
 };
 
 static const char* const TEENS[] ={
   "",
-  "eleven",
-  "twelve",
-  "thirteen",
-  "fourteen",
-  "fifteen",
-  "sixteen",
-  "seventeen",
-  "eightteen",
-  "nineteen"
+  "elf",
+  "twaalf",
+  "dertien",
+  "veertien",
+  "vyftien",
+  "sestien",
+  "sewentien",
+  "agttien",
+  "negentien"
 };
 
 static const char* const TENS[] = {
   "",
-  "ten",
-  "twenty",
-  "thirty",
-  "forty",
-  "fifty",
-  "sixty",
-  "seventy",
-  "eighty",
-  "ninety"
+  "tien",
+  "twintig",
+  "dertig",
+  "veertig",
+  "vyftig",
+  "sestig",
+  "sewentig",
+  "tagtig",
+  "negentig"
 };
 
 static size_t append_number(char* words, int num) {
@@ -46,23 +46,35 @@ static size_t append_number(char* words, int num) {
 
   size_t len = 0;
 
+
   if (tens_val > 0) {
     if (tens_val == 1 && num != 10) {
       strcat(words, TEENS[ones_val]);
       return strlen(TEENS[ones_val]);
     }
+
+    if (ones_val > 0 || num == 0) {
+      strcat(words, ONES[ones_val]);
+      len += strlen(ONES[ones_val]);
+      strcat(words, " en+");
+      len += 4;
+    }
+
     strcat(words, TENS[tens_val]);
     len += strlen(TENS[tens_val]);
-    if (ones_val > 0) {
-      strcat(words, " ");
-      len += 1;
-    }
+    //if (ones_val > 0) {
+    //  strcat(words, " ");
+    //  len += 1;
+    //}
   }
 
   if (ones_val > 0 || num == 0) {
-    strcat(words, ONES[ones_val]);
-    len += strlen(ONES[ones_val]);
+    if (tens_val == 0) {
+      strcat(words, ONES[ones_val]);
+      len += strlen(ONES[ones_val]);
+    }
   }
+
   return len;
 }
 
@@ -85,9 +97,9 @@ void time_to_words(int hours, int minutes, char* words, size_t length) {
     remaining -= append_number(words, hours % 12);
   }
 
-  remaining -= append_string(words, remaining, " ");
+  remaining -= append_string(words, remaining, "+");
   remaining -= append_number(words, minutes);
-  remaining -= append_string(words, remaining, " ");
+  remaining -= append_string(words, remaining, "+");
 }
 
 void time_to_3words(int hours, int minutes, char *line1, char *line2, char *line3, size_t length)
@@ -100,7 +112,7 @@ void time_to_3words(int hours, int minutes, char *line1, char *line2, char *line
 	memset(line3, 0, length);
 	
 	char *start = value;
-	char *pch = strstr (start, " ");
+	char *pch = strstr (start, "+");
 	while (pch != NULL) {
 		if (line1[0] == 0) {
 			memcpy(line1, start, pch-start);
@@ -110,7 +122,7 @@ void time_to_3words(int hours, int minutes, char *line1, char *line2, char *line
 			memcpy(line3, start, pch-start);
 		}
 		start += pch-start+1;
-		pch = strstr(start, " ");
+		pch = strstr(start, "+");
 	}
 	
 	// Truncate long teen values
